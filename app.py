@@ -29,8 +29,8 @@ st.title("PDFChatBot")
 with st.container():
     upload_file = st.file_uploader("Please choose your PDF file", type='pdf')
     if upload_file is not None:
-        if upload_file.size > 1 * 1024 * 1024:  # 1MB
-            st.error("File size exceeds the limit of 1MB.")
+        if upload_file.size > 6 * 1024 * 1024:  # 6MB
+            st.error("File size exceeds the limit of 6MB.")
         else:
             with tempfile.NamedTemporaryFile(delete=False) as temp_file:
                 temp_path = temp_file.name
