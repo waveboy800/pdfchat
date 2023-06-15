@@ -50,7 +50,7 @@ with st.container():
     question = st.text_input("Question")
     if vectorstore is not None and question is not None and question != "":
         with st.spinner("AI is thinking..."):
-            time.sleep(2)  # Simulate waiting for the answer
+            #time.sleep(2)  # Simulate waiting for the answer
             docs = vectorstore.similarity_search(question, 3, include_metadata=True)
             answer = chain.run(input_documents=docs, question=question)
             st.write(answer)
