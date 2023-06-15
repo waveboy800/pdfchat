@@ -6,8 +6,7 @@ from langchain.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
-
-
+import time
 
 OpenAI_API_KEY = st.secrets["openai_api_key"]
 
@@ -30,11 +29,14 @@ st.title("PDFChatBot")
 with st.container():
     upload_file = st.file_uploader("Please choose your PDF file", type='pdf')
     if upload_file is not None:
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            temp_path = temp_file.name
-            with open(temp_path, 'wb') as f:
-                f.write(upload_file.getbuffer())
-            docs = load_pdf(temp_path)
+        if upload_file.size > 20 * 1024 * 1024:  # 20MB
+            st.error("File size exceeds the limit of 20MB.")
+        else:
+            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                temp_path = temp_file.name
+                with open(temp_path, 'wb') as f:
+                    f.write(upload_file.getbuffer())
+                docs = load_pdf(temp_path)
 
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
         split_docs = text_splitter.split_documents(docs)
@@ -47,6 +49,8 @@ with st.container():
 with st.container():
     question = st.text_input("Question")
     if vectorstore is not None and question is not None and question != "":
-        docs = vectorstore.similarity_search(question, 3, include_metadata=True)
-        answer = chain.run(input_documents=docs, question=question)
-        st.write(answer)
+        with st.spinner("Searching for answer..."):
+            time.sleep(2)  # Simulate waiting for the answer
+            docs = vectorstore.similarity_search(question, 3, include_metadata=True)
+            answer = chain.run(input_documents=docs, question=question)
+            st.write(answer)
